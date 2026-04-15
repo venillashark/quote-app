@@ -2,10 +2,12 @@
   <div class="app">
     <Toolbar
       :auto-saved-at="autoSavedAt"
+      :pdf-loading="pdfLoading"
       @export-excel="doExportExcel"
       @export-json="exportJSON"
       @import-json="triggerImport"
       @print="doPrint"
+      @export-pdf="doExportPDF"
     />
     <input ref="fileInput" type="file" accept=".json" style="display:none" @change="importJSON" />
 
@@ -46,10 +48,12 @@ import BottomSection from './components/BottomSection.vue'
 import SignSection   from './components/SignSection.vue'
 import { useAutoSave }  from './useAutoSave.js'
 import { exportExcel }  from './exportExcel.js'
+import { exportPDF }    from './exportPDF.js'
 
 /* ── state ── */
 const taxRate     = ref(0)
 const autoSavedAt = ref('')
+const pdfLoading  = ref(false)
 const fileInput   = ref(null)
 
 const info = reactive({
@@ -159,6 +163,18 @@ function importJSON(e) {
 }
 
 function doPrint() { window.print() }
+async function doExportPDF() {
+  pdfLoading.value = true
+  try {
+    await new Promise(r => setTimeout(r, 80))
+    await exportPDF(`水電工程估價單_${info.qno || 'quote'}`)
+  } catch (e) {
+    console.error('PDF 匯出失敗:', e)
+    alert('PDF 匯出失敗：' + e.message)
+  } finally {
+    pdfLoading.value = false
+  }
+}
 
 onMounted(() => { load() })
 </script>

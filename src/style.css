@@ -14,6 +14,7 @@
   --muted:     #555555;
   --border:    #cccccc;
   --red:       #c0392b;
+  --radius:    10px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -21,7 +22,7 @@ body {
   background: #d8dfeb;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  padding: 0 0 4rem;
+  padding: 0 0 6rem;
 }
 input, textarea, select, button { font-family: inherit; }
 .bar-navy { height: 8px; background: var(--navy); }
@@ -33,24 +34,107 @@ input, textarea, select, button { font-family: inherit; }
   box-shadow: 0 4px 32px rgba(26,53,87,.15);
 }
 
-/* ── Print ─────────────────────────────────────────────── */
+/* ── Print ─────────────────────────────────────────── */
 @media print {
   @page { size: A4 portrait; margin: 8mm 7mm; }
-  body  { background: #fff !important; padding: 0 !important; font-size: 11px !important; }
-  .toolbar-wrapper, .no-print { display: none !important; }
-  .page { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; font-size: 11px !important; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
-  table { page-break-inside: auto; }
-  tr    { page-break-inside: avoid; }
-  .cat-row, .subtotal-row { page-break-inside: avoid; page-break-after: avoid; }
 
-  /* shrink info inputs for print */
-  .info-table input, .info-table textarea { font-size: 11px !important; }
-  /* table cells */
-  .data-row td input { font-size: 11px !important; }
-  /* hide col widths that cause overflow — let browser reflow */
-  table.qt { table-layout: auto !important; }
+  body  { background:#fff!important; padding:0!important; font-size:11px!important; }
+  .toolbar-wrapper, .no-print, .mobile-fab, .mobile-total-bar { display:none!important; }
+  .page { box-shadow:none!important; max-width:100%!important; margin:0!important; font-size:11px!important; }
+  * { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; color-adjust:exact!important; }
+
+  table { page-break-inside:auto; }
+  /* 大類整塊不跨頁（僅限較小的大類，大類超過半頁則允許跨頁） */
+  tbody.cat-group { page-break-inside:auto; break-inside:auto; }
+  /* 每一列都不切斷 */
+  tr { page-break-inside:avoid; break-inside:avoid; }
+
+  /* 大類 header 後面不換頁，確保至少帶著第一個子項 */
+  .cat-row { page-break-after:avoid; break-after:avoid; }
+
+  /* 小計列前面不換頁，確保緊跟最後一個子項 */
+  .subtotal-row { page-break-before:avoid; break-before:avoid;
+                  page-break-inside:avoid; break-inside:avoid; }
+
+  /* data-row 是最後一列時，也不允許在它之後換頁（讓小計跟著） */
+  .data-row { page-break-after:avoid; break-after:avoid; }
+
+  /* ── 列印時強制顯示桌面版表格，隱藏手機版 ── */
+  .desktop-only { display:block!important; }
+  .mobile-only  { display:none!important; }
+
+  /* ── 隱藏操作欄（x 刪除按鈕那欄）── */
+  table.qt thead th:last-child,
+  table.qt tbody td:last-child { display:none!important; }
+
+  /* ── 隱藏大類標題列的按鈕群（✏️ ↑ ↓ ＋項目 ✕）── */
+  .cat-acts { display:none!important; }
+  .cat-hint { display:none!important; }
+
+  /* ── 隱藏「＋新增大類」按鈕 ── */
+  .add-cat-row { display:none!important; }
+
+  /* ── 列印表格：自動欄寬，讓內容決定寬度 ── */
+  table.qt {
+    table-layout: auto !important;
+    width: 100% !important;
+    font-size: 10px !important;
+  }
+  /* 取消所有固定欄寬 */
   table.qt col { width: auto !important; }
-  /* total-val */
-  .total-val { font-size: 11px !important; }
+
+  /* 各欄印出寬度提示（用 min/max-width 引導瀏覽器） */
+  table.qt thead th:nth-child(1),
+  table.qt tbody td:nth-child(1) { width: 20px!important; min-width:20px; }   /* # */
+
+  table.qt thead th:nth-child(2),
+  table.qt tbody td:nth-child(2) { min-width:80px; }                           /* 項目說明 */
+
+  table.qt thead th:nth-child(3),
+  table.qt tbody td:nth-child(3) { min-width:90px; }                           /* 規格/品牌（寬） */
+
+  table.qt thead th:nth-child(4),
+  table.qt tbody td:nth-child(4) { width:28px!important; min-width:28px; white-space:nowrap; }  /* 單位 */
+
+  table.qt thead th:nth-child(5),
+  table.qt tbody td:nth-child(5) { width:36px!important; min-width:36px; white-space:nowrap; }  /* 數量 */
+
+  table.qt thead th:nth-child(6),
+  table.qt tbody td:nth-child(6) { width:62px!important; min-width:62px; white-space:nowrap; }  /* 單價 */
+
+  table.qt thead th:nth-child(7),
+  table.qt tbody td:nth-child(7) { width:62px!important; min-width:62px; white-space:nowrap; }  /* 總價 */
+
+  table.qt thead th:nth-child(8),
+  table.qt tbody td:nth-child(8) { min-width:50px; }                            /* 備註 */
+
+  /* 規格欄 textarea 印出 */
+  table.qt .spec-ta {
+    white-space: pre-wrap !important;
+    overflow: visible !important;
+    height: auto !important;
+    font-size: 10px !important;
+  }
+
+  /* 數字欄不換行 */
+  .total-val { font-size: 10px!important; white-space: nowrap; }
+
+  /* 輸入框列印樣式 */
+  table.qt td input  { font-size:10px!important; }
+  .info-table input, .info-table textarea { font-size:11px!important; }
+
+  /* 底部 notes + sum 改為上下排列，版面更緊湊 */
+  .bottom-wrap { grid-template-columns: 1fr!important; gap:.6rem!important; padding-bottom:.5rem!important; }
+  .sum-box { width: 260px; margin-left:auto; }
+
+  /* ── 防止總金額區塊、備註、簽名被切頁 ── */
+  .bottom-wrap  { page-break-inside:avoid; break-inside:avoid; }
+  .sum-box      { page-break-inside:avoid; break-inside:avoid; }
+  .sign-section { page-break-inside:avoid; break-inside:avoid; }
+  .notes-box    { page-break-inside:avoid; break-inside:avoid; }
+  /* 讓整個底部區域盡量留在同一頁 */
+  .bottom-wrap, .sign-section { page-break-before:avoid; break-before:avoid; }
+
+  /* 簽名欄 margin */
+  .sign-section { margin: 0 0 .5rem!important; }
 }

@@ -26,6 +26,20 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile floating total bar -->
+  <div class="mobile-total-bar mobile-only no-print">
+    <div class="mtb-inner">
+      <div class="mtb-left">
+        <span class="mtb-label">總金額</span>
+        <select class="mtb-tax" :value="taxRate" @change="$emit('update-tax',+$event.target.value)">
+          <option value="0">未稅</option>
+          <option value="5">含稅 5%</option>
+        </select>
+      </div>
+      <span class="mtb-amount">NT$ {{ fmt(grand) }}</span>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -39,18 +53,39 @@ const grand    = computed(()=>subtotal.value+taxAmt.value)
 </script>
 
 <style scoped>
-.bottom-wrap { padding:1rem 1.5rem 1.5rem;display:grid;grid-template-columns:1fr 290px;gap:1.5rem;align-items:start }
-.notes-box label { display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.04em }
-.notes-box textarea { width:100%;border:1px solid var(--border);border-radius:4px;padding:10px;font-size:14px;color:var(--text);resize:vertical;min-height:90px;outline:none }
-.notes-box textarea:focus { border-color:var(--navy-mid) }
-.sum-box { border:2px solid var(--navy);overflow:hidden }
-.sum-row { display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border) }
-.sum-row:last-child { border-bottom:none }
-.sum-lbl { background:var(--navy-pale);padding:10px 14px;font-size:13px;font-weight:700;color:var(--navy);display:flex;flex-direction:column;justify-content:center;gap:6px;border-right:1px solid var(--border);white-space:nowrap }
-.lt { font-size:13px;font-weight:700;color:var(--navy) }
-.sum-val { background:#fff;padding:10px 14px;font-size:14px;font-weight:700;color:var(--navy);text-align:right;display:flex;align-items:center;justify-content:flex-end }
-.sum-val.muted { color:#bbb;font-weight:400 }
-.tax-sel { border:1.5px solid var(--gold);border-radius:4px;padding:4px 8px;font-size:13px;font-weight:700;color:#7A5500;background:var(--gold-light);cursor:pointer;outline:none }
-.sum-row.grand .sum-lbl { background:var(--navy);color:#fff;font-size:14px;letter-spacing:.08em;border-right:1px solid rgba(255,255,255,.2);flex-direction:row;align-items:center }
-.sum-row.grand .sum-val { background:var(--navy);color:#fff;font-size:16px }
+.bottom-wrap{padding:1rem 1.25rem 1.5rem;display:grid;grid-template-columns:1fr 290px;gap:1.5rem;align-items:start}
+.notes-box label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.04em}
+.notes-box textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);resize:vertical;min-height:90px;outline:none;white-space:pre-wrap}
+.notes-box textarea:focus{border-color:var(--navy-mid)}
+.sum-box{border:2px solid var(--navy);overflow:hidden;border-radius:4px}
+.sum-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.sum-row:last-child{border-bottom:none}
+.sum-lbl{background:var(--navy-pale);padding:10px 14px;font-size:13px;font-weight:700;color:var(--navy);display:flex;flex-direction:column;justify-content:center;gap:6px;border-right:1px solid var(--border);white-space:nowrap}
+.lt{font-size:13px;font-weight:700;color:var(--navy)}
+.sum-val{background:#fff;padding:10px 14px;font-size:14px;font-weight:700;color:var(--navy);text-align:right;display:flex;align-items:center;justify-content:flex-end}
+.sum-val.muted{color:#bbb;font-weight:400}
+.tax-sel{border:1.5px solid var(--gold);border-radius:4px;padding:4px 8px;font-size:13px;font-weight:700;color:#7A5500;background:var(--gold-light);cursor:pointer;outline:none}
+.sum-row.grand .sum-lbl{background:var(--navy);color:#fff;font-size:14px;letter-spacing:.08em;border-right:1px solid rgba(255,255,255,.2);flex-direction:row;align-items:center}
+.sum-row.grand .sum-val{background:var(--navy);color:#fff;font-size:16px}
+
+/* Mobile floating bar */
+.mobile-total-bar{display:none}
+.mobile-only{display:none}
+
+@media(max-width:700px){
+  .bottom-wrap{grid-template-columns:1fr;padding:1rem .85rem 100px}
+  .mobile-only{display:block}
+  .mobile-total-bar{
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    background:var(--navy);
+    box-shadow:0 -3px 20px rgba(26,53,87,.25);
+    padding:10px 1rem 14px;
+    padding-bottom:max(14px, env(safe-area-inset-bottom));
+  }
+  .mtb-inner{display:flex;align-items:center;justify-content:space-between;max-width:1060px;margin:0 auto}
+  .mtb-left{display:flex;align-items:center;gap:10px}
+  .mtb-label{font-size:13px;font-weight:700;color:rgba(255,255,255,.75)}
+  .mtb-tax{background:var(--gold-light);border:1.5px solid var(--gold);border-radius:6px;padding:5px 10px;font-size:13px;font-weight:700;color:#7A5500;cursor:pointer;outline:none}
+  .mtb-amount{font-size:20px;font-weight:700;color:#fff}
+}
 </style>
