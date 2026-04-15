@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+:root {
+  --navy:      #1A3557;
+  --navy-mid:  #2E6DA4;
+  --navy-light:#D6E4F0;
+  --navy-pale: #EAF2FB;
+  --gold:      #C8A96E;
+  --gold-light:#FFF9ED;
+  --gray1:     #F2F5F8;
+  --gray2:     #E8EDF2;
+  --white:     #ffffff;
+  --text:      #1a1a1a;
+  --muted:     #555555;
+  --border:    #cccccc;
+  --red:       #c0392b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: #d8dfeb;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  padding: 0 0 4rem;
+}
+input, textarea, select, button { font-family: inherit; }
+.bar-navy { height: 8px; background: var(--navy); }
+.bar-gold  { height: 5px; background: var(--gold); }
+.page {
+  max-width: 1060px;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 4px 32px rgba(26,53,87,.15);
+}
+
+/* ── Print ─────────────────────────────────────────────── */
+@media print {
+  @page { size: A4 portrait; margin: 8mm 7mm; }
+  body  { background: #fff !important; padding: 0 !important; font-size: 11px !important; }
+  .toolbar-wrapper, .no-print { display: none !important; }
+  .page { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; font-size: 11px !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  table { page-break-inside: auto; }
+  tr    { page-break-inside: avoid; }
+  .cat-row, .subtotal-row { page-break-inside: avoid; page-break-after: avoid; }
+
+  /* shrink info inputs for print */
+  .info-table input, .info-table textarea { font-size: 11px !important; }
+  /* table cells */
+  .data-row td input { font-size: 11px !important; }
+  /* hide col widths that cause overflow — let browser reflow */
+  table.qt { table-layout: auto !important; }
+  table.qt col { width: auto !important; }
+  /* total-val */
+  .total-val { font-size: 11px !important; }
+}
